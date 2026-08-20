@@ -1,6 +1,6 @@
-# Codex Capture
+# Replica — Capture UI into Code
 
-Codex Capture is a local-first Chrome extension that turns any selected website section into a structured implementation prompt for Codex. Version 0.7 moves both capture and prompt editing into one in-page cinematic glass interface.
+Replica is a local-first Chrome extension that turns any selected website section into a structured implementation prompt for Codex. Version 0.7 moves both capture and prompt editing into one in-page cinematic glass interface.
 
 It captures the DOM, computed styles, visual tokens, assets, interactive clues, continuous motion, and — in Exact mode — a pixel reference of the selected section. No built-in AI, API key, account, or backend is required.
 
@@ -34,7 +34,7 @@ It captures the DOM, computed styles, visual tokens, assets, interactive clues, 
 Use **Code → Download ZIP** on this GitHub page, or clone the repository:
 
 ```bash
-git clone https://github.com/maisjandesign/codex-capture.git
+git clone https://github.com/maisjandesign/replica.git
 ```
 
 Extract the archive if you downloaded the ZIP.
@@ -51,18 +51,18 @@ chrome://extensions
 
 Turn on **Developer mode** in the top-right corner.
 
-### 4. Load Codex Capture
+### 4. Load Replica
 
 1. Click **Load unpacked**.
-2. Select the `codex-capture` folder containing `manifest.json`.
-3. Optionally pin **Codex Capture** to the Chrome toolbar.
+2. Select the `replica` folder containing `manifest.json`.
+3. Optionally pin **Replica** to the Chrome toolbar.
 
 After pulling or editing the source, click **Reload** on the extension card in `chrome://extensions`.
 
 ## How to use it
 
 1. Open a regular website. Chrome internal pages such as `chrome://settings` cannot be inspected by extensions.
-2. Open **Codex Capture** from the toolbar.
+2. Open **Replica** from the toolbar.
 3. Choose **Quick** or **Exact**, then click **Select on page**. Exact is recommended when visual fidelity matters.
 4. Hover over the page until the desired section is highlighted.
 5. Click the section. Keep it visible while the extension records approximately 2.4 seconds of motion.
@@ -90,7 +90,7 @@ The `⌥ S` hint mirrors the selection action in the in-page panel. Select **Cap
 
 ## Motion Capture
 
-Codex Capture uses two complementary strategies:
+Replica uses two complementary strategies:
 
 ### Native browser animations
 
@@ -105,7 +105,7 @@ For CSS Animations, CSS Transitions, and the Web Animations API, it reads `eleme
 
 ### Completed entrance animations
 
-Selection normally happens after the page has loaded, so a one-time entrance animation may already be finished. Codex Capture also reads the declared computed animation and transition properties for each captured element:
+Selection normally happens after the page has loaded, so a one-time entrance animation may already be finished. Replica also reads the declared computed animation and transition properties for each captured element:
 
 - animation name, duration, delay, and easing;
 - iteration count, direction, fill mode, and play state;
@@ -115,7 +115,7 @@ The generated prompt explicitly keeps entrance/reveal motion separate from conti
 
 ### JavaScript-driven motion
 
-Libraries such as GSAP and Framer Motion may update inline styles without exposing useful keyframes. Codex Capture therefore samples visible elements every 200 ms for approximately 2.4 seconds and records changing:
+Libraries such as GSAP and Framer Motion may update inline styles without exposing useful keyframes. Replica therefore samples visible elements every 200 ms for approximately 2.4 seconds and records changing:
 
 - transforms;
 - opacity;
@@ -181,7 +181,7 @@ Reload the unpacked extension from `chrome://extensions` after making changes.
 
 ## Privacy
 
-Codex Capture works locally. Before pasting a generated prompt into any AI service, verify that the selected section contains no personal, private, or commercially sensitive information.
+Replica works locally. Before pasting a generated prompt into any AI service, verify that the selected section contains no personal, private, or commercially sensitive information.
 
 ## License
 

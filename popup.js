@@ -155,12 +155,12 @@ function buildSnapshotHtml(data) {
     });
   });
   const variables = Object.entries(data.cssVariables || {}).map(([key, value]) => `  ${key}: ${value};`).join("\n");
-  return `<!doctype html>\n<html lang="en">\n<head>\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width, initial-scale=1">\n<title>Codex Capture snapshot</title>\n<style>\n:root {\n${variables}\n}\n* { box-sizing: border-box; }\nbody { margin: 0; min-height: 100vh; }\n${rules.filter(Boolean).join("\n")}\n</style>\n</head>\n<body>\n${data.html}\n</body>\n</html>`;
+  return `<!doctype html>\n<html lang="en">\n<head>\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width, initial-scale=1">\n<title>Replica snapshot</title>\n<style>\n:root {\n${variables}\n}\n* { box-sizing: border-box; }\nbody { margin: 0; min-height: 100vh; }\n${rules.filter(Boolean).join("\n")}\n</style>\n</head>\n<body>\n${data.html}\n</body>\n</html>`;
 }
 
 function downloadReferencePack(data) {
   const pack = {
-    format: "codex-capture-reference-pack", version: "0.7.2", createdAt: new Date().toISOString(),
+    format: "replica-reference-pack", version: "0.7.2", createdAt: new Date().toISOString(),
     instructions: "Paste prompt.md into Codex and attach the reference image when exact visual matching matters. snapshot.html is a reconstruction aid.",
     files: {
       "prompt.md": buildPrompt(data),
@@ -172,7 +172,7 @@ function downloadReferencePack(data) {
   const url = URL.createObjectURL(new Blob([JSON.stringify(pack, null, 2)], { type: "application/json" }));
   const link = document.createElement("a");
   link.href = url;
-  link.download = `codex-capture-${Date.now()}.json`;
+  link.download = `replica-capture-${Date.now()}.json`;
   link.click();
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
