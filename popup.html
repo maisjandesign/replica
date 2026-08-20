@@ -5,72 +5,78 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Codex Capture</title>
     <link rel="stylesheet" href="popup.css" />
+    <style>html,body{height:590px;min-height:0}.shell{height:590px;min-height:0}.main-panel,.prompt-sheet{min-height:574px}.prompt-field textarea{min-height:220px}.shell.backdrop-ready{background:#111}.shell.backdrop-ready:after{content:"";position:absolute;z-index:0;inset:-22px;background-image:linear-gradient(rgba(9,9,8,.28),rgba(9,9,8,.42)),var(--live-backdrop);background-size:cover;background-position:center;filter:blur(15px) saturate(118%);transform:scale(1.06);animation:backdrop-focus .42s ease-out both}.shell.backdrop-ready .main-panel,.shell.backdrop-ready .prompt-sheet{background:linear-gradient(145deg,rgba(25,25,21,.5),rgba(7,7,6,.36));backdrop-filter:blur(28px) saturate(130%)}@keyframes backdrop-focus{from{opacity:0;filter:blur(24px) saturate(100%)}to{opacity:1;filter:blur(15px) saturate(118%)}}</style>
   </head>
   <body>
     <main class="shell">
-      <div class="aurora aurora-a"></div>
-      <div class="aurora aurora-b"></div>
+      <div class="ambient ambient-a" aria-hidden="true"></div>
+      <div class="ambient ambient-b" aria-hidden="true"></div>
 
-      <header class="topbar">
-        <div class="brand-mark" aria-hidden="true">
-          <span></span><span></span><span></span><span></span>
-        </div>
-        <div class="brand-copy">
-          <strong>Codex Capture</strong>
-          <span>Turn interfaces into build prompts</span>
-        </div>
-        <button class="icon-button" id="resetButton" title="Clear selection" aria-label="Clear selection">
-          <svg viewBox="0 0 24 24"><path d="M4 4v5h5M20 20v-5h-5M5.6 15.5A7 7 0 0 0 18.4 17M18.4 8.5A7 7 0 0 0 5.6 7"/></svg>
-        </button>
-      </header>
+      <section class="main-panel" aria-labelledby="captureTitle">
+        <header class="topbar">
+          <div class="brand-copy"><strong>CODEX CAPTURE</strong><span>— V0.6.3</span></div>
+          <button class="icon-button" id="resetButton" type="button" aria-label="Clear capture" title="Clear capture">
+            <svg viewBox="0 0 24 24"><path d="M5 5v5h5M19 19v-5h-5M6.4 15.6A7 7 0 0 0 18 17M17.6 8.4A7 7 0 0 0 6 7"/></svg>
+          </button>
+        </header>
 
-      <section class="glass-card capture-card" aria-labelledby="captureTitle">
-        <div class="capture-orbit" aria-hidden="true"><span></span></div>
-        <div class="eyebrow"><i></i><span id="stateLabel">Ready to capture</span></div>
-        <h1 id="captureTitle">Select a section<br />from any website.</h1>
-        <p id="captureMeta">We’ll read its structure, visual rules and interactive clues.</p>
-        <button class="primary-button" id="selectButton">
+        <div class="hero-copy">
+          <div class="eyebrow"><i></i><span id="stateLabel">Exact capture ready</span></div>
+          <h1 id="captureTitle">Turn any interface<br />into a Codex prompt.</h1>
+          <p id="captureMeta">Capture pixels, structure, motion and visual rules in one pass.</p>
+        </div>
+
+        <div class="capture-preview" id="capturePreview" hidden>
+          <img id="previewImage" alt="Captured section preview" />
+          <span id="previewBadge">Exact · visible crop</span>
+        </div>
+
+        <div class="capture-kind" role="radiogroup" aria-label="Capture fidelity">
+          <button type="button" data-kind="quick" role="radio" aria-checked="false"><strong>Quick</strong><small>DOM + motion</small></button>
+          <button type="button" data-kind="exact" role="radio" aria-checked="true"><strong>Exact</strong><small>Pixels + full context</small></button>
+        </div>
+
+        <button class="primary-button" id="selectButton" type="button">
           <svg viewBox="0 0 24 24"><path d="M5 3H3v6m16-6h2v6M5 21H3v-6m16 6h2v-6M8 8h8v8H8z"/></svg>
-          <span>Select on page</span>
-          <kbd>⌥ S</kbd>
+          <span>Select on page</span><kbd>⌥ S</kbd>
         </button>
+
+        <details class="recipe">
+          <summary><span>Build recipe</span><small>Local only</small></summary>
+          <div class="recipe-body">
+            <label class="setting-row"><span>Target</span><select id="target"><option>React</option><option>Next.js</option><option>Vue</option><option>HTML</option></select></label>
+            <label class="setting-row"><span>Styling</span><select id="styling"><option>Tailwind CSS</option><option>CSS Modules</option><option>Plain CSS</option><option>Styled Components</option></select></label>
+            <label class="setting-row"><span>Output</span><select id="mode"><option>UI + behavior</option><option>Visual UI only</option><option>Behavior only</option></select></label>
+            <div class="chips" aria-label="Additional context">
+              <button class="chip active" data-pref="responsive" type="button"><i></i><span>Responsive</span></button>
+              <button class="chip active" data-pref="accessibility" type="button"><i></i><span>A11y</span></button>
+              <button class="chip active" data-pref="assets" type="button"><i></i><span>Assets</span></button>
+            </div>
+          </div>
+        </details>
+
+        <button class="generate-button" id="generateButton" disabled type="button">
+          <span class="generate-copy"><strong>Copy Codex prompt</strong><small id="generateHint">Select a section first</small></span>
+          <svg viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></svg>
+        </button>
+        <div class="secondary-actions" id="secondaryActions" hidden>
+          <button id="copyImageButton" type="button">Copy image</button>
+          <button id="downloadButton" type="button">Download pack</button>
+        </div>
+        <p class="privacy-note"><i></i> Processed locally on this device</p>
       </section>
 
-      <section class="glass-card settings-card" aria-label="Prompt settings">
-        <div class="section-heading">
-          <span>Build recipe</span>
-          <span class="local-pill"><i></i> Local only</span>
-        </div>
-
-        <label class="setting-row">
-          <span class="setting-icon"><svg viewBox="0 0 24 24"><path d="m8 9-4 3 4 3m8-6 4 3-4 3m-2-9-4 12"/></svg></span>
-          <span class="setting-copy"><small>Target</small><select id="target"><option>React</option><option>Next.js</option><option>Vue</option><option>HTML</option></select></span>
-          <svg class="chevron" viewBox="0 0 24 24"><path d="m9 10 3 3 3-3"/></svg>
-        </label>
-        <label class="setting-row">
-          <span class="setting-icon"><svg viewBox="0 0 24 24"><path d="M12 3 4 8l8 5 8-5-8-5Zm-8 10 8 5 8-5M7 17l5 3 5-3"/></svg></span>
-          <span class="setting-copy"><small>Styling</small><select id="styling"><option>Tailwind CSS</option><option>CSS Modules</option><option>Plain CSS</option><option>Styled Components</option></select></span>
-          <svg class="chevron" viewBox="0 0 24 24"><path d="m9 10 3 3 3-3"/></svg>
-        </label>
-        <label class="setting-row">
-          <span class="setting-icon"><svg viewBox="0 0 24 24"><path d="M5 5h14v14H5zM8 9h8M8 12h5M8 15h7"/></svg></span>
-          <span class="setting-copy"><small>Capture mode</small><select id="mode"><option>UI + behavior</option><option>Visual UI only</option><option>Behavior only</option></select></span>
-          <svg class="chevron" viewBox="0 0 24 24"><path d="m9 10 3 3 3-3"/></svg>
-        </label>
-
-        <div class="chips" aria-label="Additional context">
-          <button class="chip active" data-pref="responsive"><span>Responsive</span><i></i></button>
-          <button class="chip active" data-pref="accessibility"><span>A11y</span><i></i></button>
-          <button class="chip active" data-pref="assets"><span>Assets</span><i></i></button>
-        </div>
+      <section class="prompt-sheet" id="promptSheet" hidden aria-labelledby="promptTitle">
+        <header class="prompt-sheet__header">
+          <div><span class="prompt-kicker">CAPTURE READY</span><h2 id="promptTitle">Your Codex prompt</h2></div>
+          <button class="sheet-close" id="closePromptButton" type="button" aria-label="Edit capture settings"><svg viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg></button>
+        </header>
+        <div class="prompt-summary"><img id="promptPreview" alt="" /><div><strong id="promptElementName"></strong><small id="promptStats"></small></div><span>Exact</span></div>
+        <label class="prompt-field" for="promptOutput"><span>Editable implementation prompt</span><textarea id="promptOutput" readonly spellcheck="false"></textarea></label>
+        <button class="copy-prompt-button" id="copyPromptButton" type="button"><span class="copy-icon"><svg class="copy-symbol" viewBox="0 0 24 24"><path d="M8 8h11v11H8zM5 16H4V5h11v1"/></svg><svg class="check-symbol" viewBox="0 0 24 24"><path d="m5 12 4 4 10-10"/></svg></span><span><strong>Copy prompt</strong><small>Paste it directly into Codex</small></span></button>
+        <div class="sheet-actions"><button id="sheetRecaptureButton" type="button">Capture another</button><button id="sheetDownloadButton" type="button">Download pack</button></div>
+        <p class="privacy-note"><i></i> Processed locally on this device</p>
       </section>
-
-      <button class="generate-button" id="generateButton" disabled>
-        <span class="generate-icon"><svg viewBox="0 0 24 24"><path d="m12 3 1.4 4.6L18 9l-4.6 1.4L12 15l-1.4-4.6L6 9l4.6-1.4L12 3Zm6 11 .7 2.3L21 17l-2.3.7L18 20l-.7-2.3L15 17l2.3-.7L18 14Z"/></svg></span>
-        <span class="generate-copy"><strong>Generate Codex prompt</strong><small id="generateHint">Select a section first</small></span>
-        <svg class="arrow" viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></svg>
-      </button>
-
       <div class="toast" id="toast" role="status" aria-live="polite"></div>
     </main>
     <script src="popup.js"></script>

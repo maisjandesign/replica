@@ -1,15 +1,21 @@
 # Codex Capture
 
-Codex Capture is a local-first Chrome extension that turns any selected website section into a structured implementation prompt for Codex.
+Codex Capture is a local-first Chrome extension that turns any selected website section into a structured implementation prompt for Codex. Version 0.7 moves both capture and prompt editing into one in-page cinematic glass interface.
 
-It captures the DOM, computed styles, visual tokens, assets, interactive clues, and continuous motion. No built-in AI, API key, account, or backend is required.
+It captures the DOM, computed styles, visual tokens, assets, interactive clues, continuous motion, and — in Exact mode — a pixel reference of the selected section. No built-in AI, API key, account, or backend is required.
 
 ## Features
 
 - Select a DOM section visually on any regular website.
+- Switch between **Quick** capture (smaller DOM + motion payload) and **Exact** capture (pixels + full context).
+- Preview the captured section directly in the extension.
+- Copy the pixel reference or download a portable Codex reference pack.
+- Open an editable smoked-glass prompt card directly over the source website when capture finishes.
+- Switch between a full evidence-rich prompt and a compact implementation brief.
 - See element boundaries and dimensions while hovering.
 - Capture a cleaned HTML tree of up to 180 elements.
 - Collect relevant computed CSS properties.
+- Collect visible `::before` and `::after` pseudo-elements and CSS custom properties in Exact mode.
 - Extract common colors, typography, radii, and shadows.
 - Detect links, buttons, form controls, and other interactive elements.
 - Resolve image, poster, `srcset`, and background asset URLs.
@@ -57,16 +63,30 @@ After pulling or editing the source, click **Reload** on the extension card in `
 
 1. Open a regular website. Chrome internal pages such as `chrome://settings` cannot be inspected by extensions.
 2. Open **Codex Capture** from the toolbar.
-3. Click **Select on page**.
+3. Choose **Quick** or **Exact**, then click **Select on page**. Exact is recommended when visual fidelity matters.
 4. Hover over the page until the desired section is highlighted.
 5. Click the section. Keep it visible while the extension records approximately 2.4 seconds of motion.
 6. Wait for the green **Captured** confirmation. Press `Escape` before clicking to cancel selection.
-7. Open the extension again.
-8. Choose the target framework, styling approach, and capture mode.
-9. Click **Generate Codex prompt**.
-10. Paste the prompt into Codex and tell it which project should receive the implementation.
+7. A cinematic glass prompt card opens directly over the website when recording finishes.
+8. Edit the prompt if needed, choose **Full capture** or **Compact**, then click **Copy prompt**.
 
-The `⌥ S` shortcut starts element selection while the extension popup is open.
+Use **Capture another** to restart without reopening the toolbar popup. Press `Escape` or select the dimmed page area to close the prompt card.
+
+For higher-fidelity work, use **Download JSON** and provide the structured capture file alongside the copied prompt. The JSON includes the extracted element tree, styles, tokens, behavior, motion evidence, assets, and Exact-mode pixel reference.
+
+## Capture modes
+
+### Quick
+
+Captures the cleaned element tree, computed styles, assets, behavior, tokens, and motion. Use it for simple UI, smaller prompts, and fast iteration.
+
+### Exact
+
+Adds a screenshot of the visible part of the selected section, pseudo-element styles, and inherited CSS custom properties. The screenshot is treated as the visual source of truth while DOM and computed styles provide measurements and implementation clues.
+
+Chrome can only screenshot the visible tab. If a selected section extends beyond the viewport, the preview is marked **visible crop**. Scroll or zoom so the complete section is visible before capturing when possible.
+
+The `⌥ S` hint mirrors the selection action in the in-page panel. Select **Capture another** to start a new capture without reopening the toolbar action.
 
 ## Motion Capture
 
@@ -117,6 +137,8 @@ Only elements whose sampled values changed are included in the final motion trac
 - Native animation metadata and keyframes.
 - Declared animation and transition timing for completed entrance effects.
 - Sampled motion tracks for script-driven animation.
+- Pixel reference and screenshot coverage metadata in Exact mode.
+- Visible pseudo-element styles and CSS custom properties in Exact mode.
 - Target stack, responsive, accessibility, and asset requirements.
 
 All capture data remains in `chrome.storage.local`. The extension does not call an AI service or send page contents to a server.
@@ -125,7 +147,8 @@ All capture data remains in `chrome.storage.local`. The extension does not call 
 
 - Server-side behavior and private APIs cannot be recovered from the DOM.
 - Cross-origin iframe contents cannot be captured from the parent page.
-- Canvas pixels, video frames, closed Shadow DOM, and pseudo-elements are not fully reconstructed.
+- Canvas internals, video frames, and closed Shadow DOM cannot be reconstructed from page markup. Exact mode still captures their visible pixels.
+- Exact screenshots include only the visible portion of the selected section.
 - Large sections are intentionally limited by element count and HTML size.
 - Motion that starts only after an unrecorded click, scroll, or hover may not appear in the capture.
 - A 2.4-second recording may capture only part of a very long animation cycle.

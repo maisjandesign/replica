@@ -1,12 +1,11 @@
 {
   "manifest_version": 3,
   "name": "Codex Capture",
-  "version": "0.3.0",
-  "description": "Select a section on any page and turn it into an implementation prompt for Codex.",
+  "version": "0.7.2",
+  "description": "Capture a website section and turn it into an editable Codex prompt in a cinematic in-page glass interface.",
   "permissions": ["activeTab", "scripting", "storage"],
   "action": {
-    "default_title": "Codex Capture",
-    "default_popup": "popup.html"
+    "default_title": "Open Codex Capture"
   },
   "background": {
     "service_worker": "background.js"
