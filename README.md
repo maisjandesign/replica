@@ -14,6 +14,7 @@ It captures the DOM, computed styles, visual tokens, assets, interactive clues, 
 - Detect links, buttons, form controls, and other interactive elements.
 - Resolve image, poster, `srcset`, and background asset URLs.
 - Capture native CSS and Web Animations keyframes and timing.
+- Preserve declared CSS animation and transition timing even after an entrance animation has finished.
 - Sample JavaScript-driven motion such as GSAP or Framer Motion transforms.
 - Choose React, Next.js, Vue, or HTML as the target.
 - Choose Tailwind CSS, CSS Modules, plain CSS, or Styled Components.
@@ -82,6 +83,16 @@ For CSS Animations, CSS Transitions, and the Web Animations API, it reads `eleme
 - iteration count and fill mode;
 - playback rate, play state, and current time.
 
+### Completed entrance animations
+
+Selection normally happens after the page has loaded, so a one-time entrance animation may already be finished. Codex Capture also reads the declared computed animation and transition properties for each captured element:
+
+- animation name, duration, delay, and easing;
+- iteration count, direction, fill mode, and play state;
+- transition properties, duration, delay, and easing.
+
+The generated prompt explicitly keeps entrance/reveal motion separate from continuous illustration loops. When no entrance metadata is available, it requests a restrained one-time section reveal instead of silently dropping entrance motion.
+
 ### JavaScript-driven motion
 
 Libraries such as GSAP and Framer Motion may update inline styles without exposing useful keyframes. Codex Capture therefore samples visible elements every 200 ms for approximately 2.4 seconds and records changing:
@@ -104,6 +115,7 @@ Only elements whose sampled values changed are included in the final motion trac
 - Detected controls and destinations.
 - Absolute public asset URLs.
 - Native animation metadata and keyframes.
+- Declared animation and transition timing for completed entrance effects.
 - Sampled motion tracks for script-driven animation.
 - Target stack, responsive, accessibility, and asset requirements.
 

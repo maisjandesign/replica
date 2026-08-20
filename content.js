@@ -17,7 +17,10 @@
     "fontFamily", "fontSize", "fontWeight", "fontStyle", "lineHeight", "letterSpacing", "textAlign", "textTransform", "textDecoration",
     "color", "backgroundColor", "backgroundImage", "backgroundSize", "backgroundPosition", "borderTopWidth", "borderRightWidth",
     "borderBottomWidth", "borderLeftWidth", "borderTopColor", "borderRightColor", "borderBottomColor", "borderLeftColor", "borderRadius",
-    "boxShadow", "opacity", "transform", "filter", "backdropFilter", "objectFit", "objectPosition", "cursor", "zIndex"
+    "boxShadow", "opacity", "transform", "filter", "backdropFilter", "objectFit", "objectPosition", "cursor", "zIndex",
+    "animationName", "animationDuration", "animationDelay", "animationTimingFunction", "animationIterationCount",
+    "animationDirection", "animationFillMode", "animationPlayState", "transitionProperty", "transitionDuration",
+    "transitionDelay", "transitionTimingFunction"
   ];
 
   let overlay;
@@ -228,6 +231,41 @@
     });
   }
 
+  function hasNonZeroTime(value) {
+    return value.split(",").some((part) => Number.parseFloat(part) > 0);
+  }
+
+  function collectDeclaredAnimations(idMap) {
+    const declared = [];
+    for (const [id, element] of idMap) {
+      const style = getComputedStyle(element);
+      const hasAnimation = style.animationName.split(",").some((name) => name.trim() !== "none");
+      const hasTransition = hasNonZeroTime(style.transitionDuration) || hasNonZeroTime(style.transitionDelay);
+      if (!hasAnimation && !hasTransition) continue;
+      declared.push({
+        target: id,
+        animation: hasAnimation ? {
+          name: style.animationName,
+          duration: style.animationDuration,
+          delay: style.animationDelay,
+          easing: style.animationTimingFunction,
+          iterations: style.animationIterationCount,
+          direction: style.animationDirection,
+          fillMode: style.animationFillMode,
+          playState: style.animationPlayState
+        } : null,
+        transition: hasTransition ? {
+          property: style.transitionProperty,
+          duration: style.transitionDuration,
+          delay: style.transitionDelay,
+          easing: style.transitionTimingFunction
+        } : null
+      });
+      if (declared.length >= 60) break;
+    }
+    return declared;
+  }
+
   function readMotionFrame(element, startedAt) {
     const style = getComputedStyle(element);
     const rect = element.getBoundingClientRect();
@@ -270,11 +308,13 @@
     const reverseIds = new Map([...idMap].map(([id, element]) => [element, id]));
     const root = idMap.get("cc-0");
     const cssAnimations = collectNativeAnimations(root, reverseIds);
+    const declaredAnimations = collectDeclaredAnimations(idMap);
     const sampledTracks = await sampleMotion(idMap);
     return {
       recordingDurationMs: MOTION_DURATION_MS,
       sampleIntervalMs: MOTION_SAMPLE_MS,
       cssAnimations,
+      declaredAnimations,
       sampledTracks
     };
   }
