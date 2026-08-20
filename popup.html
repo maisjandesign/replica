@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Codex Capture</title>
+    <link rel="stylesheet" href="popup.css" />
+  </head>
+  <body>
+    <main class="shell">
+      <div class="aurora aurora-a"></div>
+      <div class="aurora aurora-b"></div>
+
+      <header class="topbar">
+        <div class="brand-mark" aria-hidden="true">
+          <span></span><span></span><span></span><span></span>
+        </div>
+        <div class="brand-copy">
+          <strong>Codex Capture</strong>
+          <span>Turn interfaces into build prompts</span>
+        </div>
+        <button class="icon-button" id="resetButton" title="Clear selection" aria-label="Clear selection">
+          <svg viewBox="0 0 24 24"><path d="M4 4v5h5M20 20v-5h-5M5.6 15.5A7 7 0 0 0 18.4 17M18.4 8.5A7 7 0 0 0 5.6 7"/></svg>
+        </button>
+      </header>
+
+      <section class="glass-card capture-card" aria-labelledby="captureTitle">
+        <div class="capture-orbit" aria-hidden="true"><span></span></div>
+        <div class="eyebrow"><i></i><span id="stateLabel">Ready to capture</span></div>
+        <h1 id="captureTitle">Select a section<br />from any website.</h1>
+        <p id="captureMeta">We’ll read its structure, visual rules and interactive clues.</p>
+        <button class="primary-button" id="selectButton">
+          <svg viewBox="0 0 24 24"><path d="M5 3H3v6m16-6h2v6M5 21H3v-6m16 6h2v-6M8 8h8v8H8z"/></svg>
+          <span>Select on page</span>
+          <kbd>⌥ S</kbd>
+        </button>
+      </section>
+
+      <section class="glass-card settings-card" aria-label="Prompt settings">
+        <div class="section-heading">
+          <span>Build recipe</span>
+          <span class="local-pill"><i></i> Local only</span>
+        </div>
+
+        <label class="setting-row">
+          <span class="setting-icon"><svg viewBox="0 0 24 24"><path d="m8 9-4 3 4 3m8-6 4 3-4 3m-2-9-4 12"/></svg></span>
+          <span class="setting-copy"><small>Target</small><select id="target"><option>React</option><option>Next.js</option><option>Vue</option><option>HTML</option></select></span>
+          <svg class="chevron" viewBox="0 0 24 24"><path d="m9 10 3 3 3-3"/></svg>
+        </label>
+        <label class="setting-row">
+          <span class="setting-icon"><svg viewBox="0 0 24 24"><path d="M12 3 4 8l8 5 8-5-8-5Zm-8 10 8 5 8-5M7 17l5 3 5-3"/></svg></span>
+          <span class="setting-copy"><small>Styling</small><select id="styling"><option>Tailwind CSS</option><option>CSS Modules</option><option>Plain CSS</option><option>Styled Components</option></select></span>
+          <svg class="chevron" viewBox="0 0 24 24"><path d="m9 10 3 3 3-3"/></svg>
+        </label>
+        <label class="setting-row">
+          <span class="setting-icon"><svg viewBox="0 0 24 24"><path d="M5 5h14v14H5zM8 9h8M8 12h5M8 15h7"/></svg></span>
+          <span class="setting-copy"><small>Capture mode</small><select id="mode"><option>UI + behavior</option><option>Visual UI only</option><option>Behavior only</option></select></span>
+          <svg class="chevron" viewBox="0 0 24 24"><path d="m9 10 3 3 3-3"/></svg>
+        </label>
+
+        <div class="chips" aria-label="Additional context">
+          <button class="chip active" data-pref="responsive"><span>Responsive</span><i></i></button>
+          <button class="chip active" data-pref="accessibility"><span>A11y</span><i></i></button>
+          <button class="chip active" data-pref="assets"><span>Assets</span><i></i></button>
+        </div>
+      </section>
+
+      <button class="generate-button" id="generateButton" disabled>
+        <span class="generate-icon"><svg viewBox="0 0 24 24"><path d="m12 3 1.4 4.6L18 9l-4.6 1.4L12 15l-1.4-4.6L6 9l4.6-1.4L12 3Zm6 11 .7 2.3L21 17l-2.3.7L18 20l-.7-2.3L15 17l2.3-.7L18 14Z"/></svg></span>
+        <span class="generate-copy"><strong>Generate Codex prompt</strong><small id="generateHint">Select a section first</small></span>
+        <svg class="arrow" viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></svg>
+      </button>
+
+      <div class="toast" id="toast" role="status" aria-live="polite"></div>
+    </main>
+    <script src="popup.js"></script>
+  </body>
+</html>
