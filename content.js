@@ -4,6 +4,11 @@
 
   const MAX_NODES = 180;
   const MAX_HTML = 45000;
+  const MOTION_DURATION_MS = 2400;
+  const MOTION_SAMPLE_MS = 200;
+  const MAX_MOTION_NODES = 80;
+  const MAX_MOTION_TRACKS = 30;
+  const MOTION_KEYS = ["transform", "opacity", "filter", "backgroundPosition"];
   const STYLE_KEYS = [
     "display", "position", "boxSizing", "width", "height", "minWidth", "maxWidth", "minHeight", "maxHeight",
     "marginTop", "marginRight", "marginBottom", "marginLeft", "paddingTop", "paddingRight", "paddingBottom", "paddingLeft",
@@ -68,10 +73,12 @@
     positionOverlay(hovered);
   }
 
-  function stop() {
+  function stop(hide = true) {
     active = false;
-    overlay.style.display = "none";
-    tooltip.style.display = "none";
+    if (hide) {
+      overlay.style.display = "none";
+      tooltip.style.display = "none";
+    }
     document.removeEventListener("mousemove", onMove, true);
     document.removeEventListener("click", onClick, true);
     document.removeEventListener("keydown", onKeyDown, true);
@@ -95,6 +102,18 @@
       [...node.attributes].forEach((attribute) => {
         if (/^on/i.test(attribute.name) || attribute.name === "nonce" || attribute.name === "integrity") node.removeAttribute(attribute.name);
       });
+      ["src", "poster"].forEach((attribute) => {
+        const value = node.getAttribute(attribute);
+        if (!value || value.startsWith("data:") || value.startsWith("blob:")) return;
+        try { node.setAttribute(attribute, new URL(value, location.href).href); } catch (_) {}
+      });
+      const srcset = node.getAttribute("srcset");
+      if (srcset) {
+        node.setAttribute("srcset", srcset.split(",").map((candidate) => {
+          const [url, descriptor] = candidate.trim().split(/\s+/, 2);
+          try { return `${new URL(url, location.href).href}${descriptor ? ` ${descriptor}` : ""}`; } catch (_) { return candidate; }
+        }).join(", "));
+      }
       if (["SCRIPT", "NOSCRIPT", "STYLE", "LINK", "META"].includes(node.tagName)) node.remove();
     });
     return clone.outerHTML.slice(0, MAX_HTML);
@@ -156,6 +175,110 @@
     };
   }
 
+  function round(value) {
+    return Math.round(value * 100) / 100;
+  }
+
+  function serializeNumber(value) {
+    return typeof value === "number" && !Number.isFinite(value) ? String(value) : value;
+  }
+
+  function serializeTiming(effect) {
+    const specified = effect.getTiming();
+    const computed = effect.getComputedTiming();
+    return {
+      delay: serializeNumber(specified.delay),
+      duration: serializeNumber(specified.duration),
+      easing: specified.easing,
+      endDelay: serializeNumber(specified.endDelay),
+      fill: specified.fill,
+      direction: specified.direction,
+      iterations: serializeNumber(specified.iterations),
+      iterationStart: specified.iterationStart,
+      activeDuration: serializeNumber(computed.activeDuration),
+      endTime: serializeNumber(computed.endTime)
+    };
+  }
+
+  function collectNativeAnimations(element, reverseIds) {
+    if (typeof element.getAnimations !== "function") return [];
+    let animations = [];
+    try { animations = element.getAnimations({ subtree: true }); } catch (_) { animations = element.getAnimations(); }
+    return animations.slice(0, 60).map((animation, index) => {
+      const effect = animation.effect;
+      const target = effect?.target;
+      const keyframes = typeof effect?.getKeyframes === "function"
+        ? effect.getKeyframes().map((frame) => {
+            const clean = {};
+            ["offset", "computedOffset", "easing", "composite", ...MOTION_KEYS, "translate", "rotate", "scale", "clipPath"].forEach((key) => {
+              if (frame[key] !== undefined && frame[key] !== "") clean[key] = frame[key];
+            });
+            return clean;
+          })
+        : [];
+      return {
+        id: `animation-${index}`,
+        target: target instanceof Element ? reverseIds.get(target) || describe(target) : "unknown",
+        playState: animation.playState,
+        currentTime: typeof animation.currentTime === "number" ? round(animation.currentTime) : animation.currentTime,
+        playbackRate: animation.playbackRate,
+        timing: effect && typeof effect.getTiming === "function" ? serializeTiming(effect) : null,
+        keyframes
+      };
+    });
+  }
+
+  function readMotionFrame(element, startedAt) {
+    const style = getComputedStyle(element);
+    const rect = element.getBoundingClientRect();
+    return {
+      time: Math.round(performance.now() - startedAt),
+      transform: style.transform,
+      opacity: style.opacity,
+      filter: style.filter,
+      backgroundPosition: style.backgroundPosition,
+      rect: { x: round(rect.x), y: round(rect.y), width: round(rect.width), height: round(rect.height) }
+    };
+  }
+
+  async function sampleMotion(idMap) {
+    const candidates = [...idMap.entries()]
+      .filter(([, element]) => element.isConnected && getComputedStyle(element).display !== "none")
+      .slice(0, MAX_MOTION_NODES);
+    const tracks = new Map(candidates.map(([id]) => [id, []]));
+    const startedAt = performance.now();
+    const sampleCount = Math.ceil(MOTION_DURATION_MS / MOTION_SAMPLE_MS) + 1;
+
+    for (let sample = 0; sample < sampleCount; sample += 1) {
+      candidates.forEach(([id, element]) => tracks.get(id).push(readMotionFrame(element, startedAt)));
+      if (sample < sampleCount - 1) await new Promise((resolve) => setTimeout(resolve, MOTION_SAMPLE_MS));
+    }
+
+    const changedTracks = {};
+    let trackCount = 0;
+    for (const [id, frames] of tracks) {
+      const signatures = new Set(frames.map((frame) => JSON.stringify({ ...frame, time: 0 })));
+      if (signatures.size > 1 && trackCount < MAX_MOTION_TRACKS) {
+        changedTracks[id] = frames;
+        trackCount += 1;
+      }
+    }
+    return changedTracks;
+  }
+
+  async function captureMotion(idMap) {
+    const reverseIds = new Map([...idMap].map(([id, element]) => [element, id]));
+    const root = idMap.get("cc-0");
+    const cssAnimations = collectNativeAnimations(root, reverseIds);
+    const sampledTracks = await sampleMotion(idMap);
+    return {
+      recordingDurationMs: MOTION_DURATION_MS,
+      sampleIntervalMs: MOTION_SAMPLE_MS,
+      cssAnimations,
+      sampledTracks
+    };
+  }
+
   async function onClick(event) {
     if (!active || !hovered || isOwnElement(event.target)) return;
     event.preventDefault();
@@ -165,6 +288,10 @@
     const idMap = new Map();
     const html = cleanClone(selected, idMap);
     const behavior = collectBehavior(selected);
+    stop(false);
+    positionOverlay(selected);
+    tooltip.innerHTML = `Recording motion <small>${MOTION_DURATION_MS / 1000}s · keep the section visible</small>`;
+    const motion = await captureMotion(idMap);
     const data = {
       capturedAt: new Date().toISOString(),
       page: { url: location.href, title: document.title, viewport: { width: innerWidth, height: innerHeight, devicePixelRatio } },
@@ -173,10 +300,10 @@
       styles: captureStyles(idMap),
       tokens: collectTokens(selected),
       assets: collectAssets(selected),
-      behavior
+      behavior,
+      motion
     };
     await chrome.storage.local.set({ capture: data });
-    stop();
     showConfirmation(selected);
   }
 

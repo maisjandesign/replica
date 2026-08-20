@@ -1,116 +1,140 @@
 # Codex Capture
 
-Chrome extension that turns a selected section of any website into a structured implementation prompt for Codex.
+Codex Capture is a local-first Chrome extension that turns any selected website section into a structured implementation prompt for Codex.
 
-No built-in AI, API key or backend is required. The extension collects the available frontend context locally and copies a prompt to your clipboard.
+It captures the DOM, computed styles, visual tokens, assets, interactive clues, and continuous motion. No built-in AI, API key, account, or backend is required.
 
-## Возможности
+## Features
 
-- Визуальный выбор DOM-секции прямо на странице.
-- Подсветка элемента и отображение его размеров.
-- Сбор очищенного HTML до 180 элементов.
-- Сбор ключевых computed CSS-свойств.
-- Извлечение цветов, шрифтов, радиусов и теней.
-- Обнаружение ссылок, кнопок, полей и других интерактивных элементов.
-- Сбор публичных изображений и фоновых ресурсов.
-- Выбор React, Next.js, Vue или HTML.
-- Выбор Tailwind CSS, CSS Modules, Plain CSS или Styled Components.
-- Настройки responsive, accessibility и assets.
-- Генерация готового промпта для Codex.
+- Select a DOM section visually on any regular website.
+- See element boundaries and dimensions while hovering.
+- Capture a cleaned HTML tree of up to 180 elements.
+- Collect relevant computed CSS properties.
+- Extract common colors, typography, radii, and shadows.
+- Detect links, buttons, form controls, and other interactive elements.
+- Resolve image, poster, `srcset`, and background asset URLs.
+- Capture native CSS and Web Animations keyframes and timing.
+- Sample JavaScript-driven motion such as GSAP or Framer Motion transforms.
+- Choose React, Next.js, Vue, or HTML as the target.
+- Choose Tailwind CSS, CSS Modules, plain CSS, or Styled Components.
+- Add responsive, accessibility, and asset-reuse requirements.
+- Generate and copy a detailed implementation prompt for Codex.
 
-## Установка расширения в Chrome
+## Install in Chrome
 
-### 1. Скачать
+### 1. Download the extension
 
-Скачайте репозиторий через **Code → Download ZIP** на странице GitHub или клонируйте его:
+Use **Code → Download ZIP** on this GitHub page, or clone the repository:
 
 ```bash
 git clone https://github.com/maisjandesign/codex-capture.git
 ```
 
-Если скачали ZIP, распакуйте архив.
+Extract the archive if you downloaded the ZIP.
 
-### 2. Открыть страницу расширений
+### 2. Open Chrome Extensions
 
-Введите в адресной строке Chrome:
+Enter this address in Chrome:
 
 ```text
 chrome://extensions
 ```
 
-### 3. Включить режим разработчика
+### 3. Enable Developer Mode
 
-Включите переключатель **Developer mode / Режим разработчика** в правом верхнем углу.
+Turn on **Developer mode** in the top-right corner.
 
-### 4. Загрузить расширение
+### 4. Load Codex Capture
 
-1. Нажмите **Load unpacked / Загрузить распакованное расширение**.
-2. Выберите корневую папку `codex-capture`, в которой находится `manifest.json`.
-3. При желании закрепите **Codex Capture** на панели Chrome.
+1. Click **Load unpacked**.
+2. Select the `codex-capture` folder containing `manifest.json`.
+3. Optionally pin **Codex Capture** to the Chrome toolbar.
 
-После изменения исходников нажимайте кнопку **Reload** на карточке расширения в `chrome://extensions`.
+After pulling or editing the source, click **Reload** on the extension card in `chrome://extensions`.
 
-## Как пользоваться
+## How to use it
 
-1. Откройте обычный сайт. Системные страницы Chrome вроде `chrome://settings` расширениям недоступны.
-2. Нажмите иконку **Codex Capture**.
-3. Нажмите **Select on page**.
-4. Наводите курсор на страницу — текущая секция будет подсвечиваться.
-5. Кликните по нужному блоку. Для отмены нажмите `Escape`.
-6. Снова откройте расширение.
-7. Выберите целевой стек, способ стилизации и режим захвата.
-8. Нажмите **Generate Codex prompt**.
-9. Вставьте промпт в Codex и укажите, в каком проекте нужно реализовать компонент.
+1. Open a regular website. Chrome internal pages such as `chrome://settings` cannot be inspected by extensions.
+2. Open **Codex Capture** from the toolbar.
+3. Click **Select on page**.
+4. Hover over the page until the desired section is highlighted.
+5. Click the section. Keep it visible while the extension records approximately 2.4 seconds of motion.
+6. Wait for the green **Captured** confirmation. Press `Escape` before clicking to cancel selection.
+7. Open the extension again.
+8. Choose the target framework, styling approach, and capture mode.
+9. Click **Generate Codex prompt**.
+10. Paste the prompt into Codex and tell it which project should receive the implementation.
 
-Горячая клавиша `⌥ S` запускает выбор элемента, пока popup расширения открыт.
+The `⌥ S` shortcut starts element selection while the extension popup is open.
 
-## Что попадает в промпт
+## Motion Capture
 
-- URL, заголовок страницы и размер viewport.
-- Название и границы выбранного элемента.
-- Очищенное дерево HTML.
-- Карта computed styles, привязанная к временным `data-codex-capture-id`.
-- Распространённые визуальные токены.
-- Обнаруженные элементы управления и ссылки.
-- Публичные URL изображений и background assets.
-- Выбранные требования к стеку, адаптивности и доступности.
+Codex Capture uses two complementary strategies:
 
-Все данные сохраняются только в `chrome.storage.local`. Расширение не вызывает AI-сервисы и не отправляет содержимое страницы на сервер.
+### Native browser animations
 
-## Ограничения текущей версии
+For CSS Animations, CSS Transitions, and the Web Animations API, it reads `element.getAnimations()` and stores:
 
-- Серверная логика и закрытые API недоступны из DOM.
-- Содержимое cross-origin iframe не читается со страницы-родителя.
-- Canvas, видео, закрытый Shadow DOM и псевдоэлементы не реконструируются полностью.
-- Большие секции ограничиваются по количеству элементов и размеру HTML.
-- Текущая версия фиксирует один визуальный кадр и не описывает постоянные анимации.
-- Некоторые относительные URL ресурсов могут потребовать нормализации к домену исходной страницы.
+- target element ID;
+- keyframes and computed offsets;
+- duration, delay, and end delay;
+- easing and direction;
+- iteration count and fill mode;
+- playback rate, play state, and current time.
 
-## Motion Capture — следующий этап
+### JavaScript-driven motion
 
-Чтобы Codex мог воспроизводить не только статичный кадр, но и движение, планируется:
+Libraries such as GSAP and Framer Motion may update inline styles without exposing useful keyframes. Codex Capture therefore samples visible elements every 200 ms for approximately 2.4 seconds and records changing:
 
-- чтение `element.getAnimations()`;
-- сохранение keyframes, duration, easing, delay и iterations;
-- семплирование `transform`, `opacity` и `filter` в течение нескольких секунд;
-- описание синхронизации анимированных элементов;
-- короткая WebM-запись выбранной секции;
-- отдельный раздел `Motion specification` в итоговом промпте.
+- transforms;
+- opacity;
+- filters;
+- background position;
+- viewport-relative position and size.
 
-## Структура проекта
+Only elements whose sampled values changed are included in the final motion tracks. Codex is instructed to simplify noisy sub-pixel samples into intentional, reusable keyframes.
+
+## Prompt contents
+
+- Source URL, page title, and viewport dimensions.
+- Selected element name and bounds.
+- Cleaned HTML tree with temporary capture IDs.
+- Computed style map keyed by the same IDs.
+- Common visual tokens.
+- Detected controls and destinations.
+- Absolute public asset URLs.
+- Native animation metadata and keyframes.
+- Sampled motion tracks for script-driven animation.
+- Target stack, responsive, accessibility, and asset requirements.
+
+All capture data remains in `chrome.storage.local`. The extension does not call an AI service or send page contents to a server.
+
+## Current limitations
+
+- Server-side behavior and private APIs cannot be recovered from the DOM.
+- Cross-origin iframe contents cannot be captured from the parent page.
+- Canvas pixels, video frames, closed Shadow DOM, and pseudo-elements are not fully reconstructed.
+- Large sections are intentionally limited by element count and HTML size.
+- Motion that starts only after an unrecorded click, scroll, or hover may not appear in the capture.
+- A 2.4-second recording may capture only part of a very long animation cycle.
+- Motion sampling is limited to 80 visible elements to keep prompts manageable.
+
+## Project structure
 
 ```text
-manifest.json   Manifest V3 и разрешения
-background.js   Фоновый service worker
-content.js      Выбор элемента и сбор контекста страницы
-popup.html      Разметка popup
-popup.css       Liquid Glass интерфейс
-popup.js        Настройки и генерация промпта
+manifest.json   Manifest V3 configuration and permissions
+background.js   Extension service worker
+content.js      Element selection, context extraction, and motion recording
+popup.html      Popup markup
+popup.css       Liquid Glass interface styling
+popup.js        Preferences and prompt generation
 ```
 
-## Разработка
+## Development
 
-Сборка не требуется — проект использует обычные HTML, CSS и JavaScript.
+The extension uses plain HTML, CSS, and JavaScript and requires no build step.
+
+Run syntax checks with:
 
 ```bash
 node --check popup.js
@@ -118,9 +142,11 @@ node --check content.js
 node --check background.js
 ```
 
+Reload the unpacked extension from `chrome://extensions` after making changes.
+
 ## Privacy
 
-Codex Capture работает локально. Перед вставкой промпта в сторонний AI-сервис проверьте, что выбранная секция не содержит персональных, закрытых или коммерчески чувствительных данных.
+Codex Capture works locally. Before pasting a generated prompt into any AI service, verify that the selected section contains no personal, private, or commercially sensitive information.
 
 ## License
 

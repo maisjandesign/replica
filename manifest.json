@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Codex Capture",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Select a section on any page and turn it into an implementation prompt for Codex.",
   "permissions": ["activeTab", "scripting", "storage"],
   "action": {
