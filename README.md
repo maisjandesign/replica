@@ -1,8 +1,10 @@
 # Replica — Capture UI into Code
 
-Replica is a local-first Chrome extension that turns any selected website section into a structured implementation prompt for Codex. Version 0.7 moves both capture and prompt editing into one in-page cinematic glass interface.
+Replica is a local-first Chrome extension that turns any selected website section into a structured implementation prompt for Codex. Version 0.7.3 moves both capture and prompt editing into one in-page cinematic glass interface and adds optional Ko-fi support.
 
 It captures the DOM, computed styles, visual tokens, assets, interactive clues, continuous motion, and — in Exact mode — a pixel reference of the selected section. No built-in AI, API key, account, or backend is required.
+
+[![Support Replica on Ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/A5W826JCDD)
 
 ## Features
 

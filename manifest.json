@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Replica — Capture UI into Code",
-  "version": "0.7.2",
+  "version": "0.7.3",
   "description": "Capture any website section and turn its UI, motion, and visual context into implementation-ready code instructions.",
   "permissions": ["activeTab", "scripting", "storage"],
   "action": {
@@ -15,6 +15,12 @@
       "matches": ["<all_urls>"],
       "js": ["content.js"],
       "run_at": "document_idle"
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": ["kofi-button.png"],
+      "matches": ["<all_urls>"]
     }
   ]
 }

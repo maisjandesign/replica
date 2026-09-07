@@ -160,7 +160,7 @@ function buildSnapshotHtml(data) {
 
 function downloadReferencePack(data) {
   const pack = {
-    format: "replica-reference-pack", version: "0.7.2", createdAt: new Date().toISOString(),
+    format: "replica-reference-pack", version: "0.7.3", createdAt: new Date().toISOString(),
     instructions: "Paste prompt.md into Codex and attach the reference image when exact visual matching matters. snapshot.html is a reconstruction aid.",
     files: {
       "prompt.md": buildPrompt(data),
