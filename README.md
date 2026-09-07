@@ -2,7 +2,7 @@
 
 Replica is a local-first Chrome extension that turns any selected website section into a structured implementation prompt for Codex. Version 0.7.3 moves both capture and prompt editing into one in-page cinematic glass interface and adds optional Ko-fi support.
 
-[![Watch Replica in action — 40-second video](docs/media/replica-explainer-cover.png)](https://github.com/maisjandesign/replica/blob/main/docs/media/replica-explainer.mp4)
+[![Replica in action — animated demo. Click for the full video with sound.](docs/media/replica-explainer-preview.gif)](https://github.com/maisjandesign/replica/blob/main/docs/media/replica-explainer.mp4)
 
 **[▶ Watch the 40-second demo](https://github.com/maisjandesign/replica/blob/main/docs/media/replica-explainer.mp4)** · With sound · [Download video](https://github.com/maisjandesign/replica/raw/refs/heads/main/docs/media/replica-explainer.mp4)
 
